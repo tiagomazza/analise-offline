@@ -3,8 +3,13 @@ import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 import tempfile
-import os 
+import os
 from datetime import datetime
+import win32com.client as win32
+from PyPDF2 import PdfReader, PdfWriter
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import utils
+
 
 data_e_horario_atual = datetime.now()
 data_e_horario_formatados = data_e_horario_atual.strftime("%d-%m-%Y %H:%M")
@@ -70,6 +75,9 @@ ax.set_title('Comparação entre 2023 e 2024 - Janeiro', fontsize=10)
 for spine in ax.spines.values():
     spine.set_visible(False)
 
+plt.rcParams['font.sans-serif'] = 'Arial'
+plt.rcParams['font.family'] = 'sans-serif'
+
 # Salvar o primeiro gráfico como uma imagem temporária
 bar_chart_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
 plt.savefig(bar_chart_path, format='png', bbox_inches='tight')
@@ -126,6 +134,7 @@ for i, meta in enumerate(metas):
         # Adicionar título para a nova meta
         ax[i].set_title(f'Meta: {meta}')
 
+
 plt.suptitle('Porcentagem de Vendas em Relação à Meta')
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 
@@ -134,26 +143,51 @@ donut_chart_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
 plt.savefig(donut_chart_path, format='png', bbox_inches='tight')
 plt.close()
 
-# Criar um arquivo PDF e inserir as imagens
-with open('relatorio_de_vendas.pdf', 'wb') as pdf_file:
+
+report_pdf_path = 'relatorio_de_vendas.pdf'
+with open(report_pdf_path, 'wb') as pdf_file:
+    pdf = canvas.Canvas(pdf_file, pagesize=letter)
+
+    # Inserir imagem do primeiro gráfico
+    pdf.showPage()  # Adicionar uma nova página
+    pdf.drawImage(donut_chart_path, 35, 600, width=550, height=150)
+    pdf.drawString(72, 780, f"Relatório de vendas do vendedor {salesman} - realizado em {data_e_horario_formatados}")
+    pdf.drawImage(bar_chart_path, 20, 20, width=500, height=550)
+    
+
+    pdf.save()
+
+# Criar um arquivo PDF para o relatório de vendas
+report_pdf_path = 'relatorio_de_vendas.pdf'
+
+with open(report_pdf_path, 'wb') as pdf_file:
     pdf = canvas.Canvas(pdf_file, pagesize=A4)
 
     # Inserir imagem do primeiro gráfico
+    pdf.showPage()  # Adicionar uma nova página
     pdf.drawInlineImage(donut_chart_path, 35, 600, width=550, height=150)
-    #pdf.drawInlineImage(bar_chart_path, 20, 60, width=500, height=550)
-
-    pdf.drawString(72, 780, f"Relatório de vendas do vendoedor {salesman} - realizado as {data_e_horario_formatados}")
+    pdf.drawString(72, 780, f"Relatório de vendas do vendedor {salesman} - realizado em {data_e_horario_formatados}")
     pdf.drawImage(bar_chart_path, 20, 20, width=500, height=550)
-    # Adicionar uma nova página para o segundo gráfico
-    pdf.showPage()
-
-    # Inserir imagem do gráfico circular
-  
 
     pdf.save()
+
 
 # Remover os arquivos temporários
 os.remove(bar_chart_path)
 os.remove(donut_chart_path)
 
-print("Relatório de vendas salvo como 'relatorio_de_vendas.pdf'")
+os.remove(report_pdf_path)
+
+print("Relatório de vendas salvo como 'relatorio_merged.pdf'")
+
+# Enviar e-mail com o relatório anexado
+outlook = win32.Dispatch('outlook.application')
+email = outlook.CreateItem(0)
+
+email.to = 'tiagomazza@gmail.com'
+email.Subject = 'Relatório de Vendas'
+email.Body = 'Por favor, encontre anexado o relatório de vendas.'
+email.Attachments.Add(report_pdf_path)
+
+# Enviar e-mail
+email.Send()

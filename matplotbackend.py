@@ -1,10 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
 import tempfile
-import os 
 from datetime import datetime
+import win32com.client as win32
+from matplotlib.backends.backend_pdf import PdfPages
 
 data_e_horario_atual = datetime.now()
 data_e_horario_formatados = data_e_horario_atual.strftime("%d-%m-%Y %H:%M")
@@ -134,26 +133,47 @@ donut_chart_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
 plt.savefig(donut_chart_path, format='png', bbox_inches='tight')
 plt.close()
 
-# Criar um arquivo PDF e inserir as imagens
-with open('relatorio_de_vendas.pdf', 'wb') as pdf_file:
-    pdf = canvas.Canvas(pdf_file, pagesize=A4)
+# Criar um arquivo PDF temporário para os gráficos
+pdf_path = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False).name
 
-    # Inserir imagem do primeiro gráfico
-    pdf.drawInlineImage(donut_chart_path, 35, 600, width=550, height=150)
-    #pdf.drawInlineImage(bar_chart_path, 20, 60, width=500, height=550)
+with PdfPages(pdf_path) as pdf:
+    # Gráfico 1
+    fig, ax = plt.subplots(figsize=(8, len(dataframe_merge) * 0.2 + 1))
+    # Adicionar código para plotar o gráfico 1
+    pdf.savefig()
+    plt.close()
 
-    pdf.drawString(72, 780, f"Relatório de vendas do vendoedor {salesman} - realizado as {data_e_horario_formatados}")
-    pdf.drawImage(bar_chart_path, 20, 20, width=500, height=550)
-    # Adicionar uma nova página para o segundo gráfico
-    pdf.showPage()
+    # Gráfico 2
+    fig, ax = plt.subplots(1, 4, figsize=(15, 4))
+    # Adicionar código para plotar o gráfico 2
+    pdf.savefig()
+    plt.close()
 
-    # Inserir imagem do gráfico circular
-  
+# Criar um arquivo PDF para o relatório de vendas
+report_pdf_path = 'relatorio_de_vendas.pdf'
+with PdfPages(report_pdf_path) as pdf:
+    # Gráfico 1
+    fig, ax = plt.subplots(figsize=(8, len(dataframe_merge) * 0.2 + 1))
+    # Adicionar código para plotar o gráfico 1
+    pdf.savefig()
+    plt.close()
 
-    pdf.save()
-
-# Remover os arquivos temporários
-os.remove(bar_chart_path)
-os.remove(donut_chart_path)
+    # Gráfico 2
+    fig, ax = plt.subplots(1, 4, figsize=(15, 4))
+    # Adicionar código para plotar o gráfico 2
+    pdf.savefig()
+    plt.close()
 
 print("Relatório de vendas salvo como 'relatorio_de_vendas.pdf'")
+
+# Enviar e-mail com o relatório anexado
+outlook = win32.Dispatch('outlook.application')
+email = outlook.CreateItem(0)
+
+email.to = 'tiagomazza@gmail.com'
+email.Subject = 'Relatório de Vendas'
+email.Body = 'Por favor, encontre anexado o relatório de vendas.'
+email.Attachments.Add(report_pdf_path)
+
+# Enviar e-mail
+email.Send()
