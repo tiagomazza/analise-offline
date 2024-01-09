@@ -65,4 +65,4 @@ ax.set_title('Comparação entre 2023 e 2024 - Janeiro', fontsize=10)
 plt.tight_layout()  # Ajuste automático de layout para evitar sobreposições
 plt.show()
 
-#
+#Teste
