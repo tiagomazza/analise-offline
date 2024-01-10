@@ -9,7 +9,8 @@ try:
     email.HtmlBody = '''
     teste de envio novo codigo
     '''
-
+    attachment_path = 'C:/caminho/do/seu/anexo.txt'  # Substitua pelo caminho real do seu arquivo
+    email.Attachments.Add(attachment_path)
     email.Send()
     print('E-mail enviado com sucesso!')
 except Exception as e:
