@@ -12,13 +12,10 @@ data_e_horario_formatados = data_e_horario_atual.strftime("%d-%m-%Y %H:%M")
 
 
 nomeLista =["Diogo","Orlando","Hugo","Vitor","Fernando",]
-emailVendedorLista =["tiagomazza@gmail.com","tiagomazza@gmail.com","tiagomazza@gmail.com","tiagomazza@gmail.com","tiagomazza@gmail.com"]
+emailVendedorLista =["tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt"]
 #emailVendedor =["diogo.bento@aborgesdoamaral.pt","orlando.cardoso@aborgesdoamaral.pt","hugo.tavares@aborgesdoamaral.pt","vitor.teixeira@aborgesdoamaral.pt","fernando.ladeiro@aborgesdoamaral.pt",]
-codigoVendedorLista =["05","30","12","06","08"]
-meta1Lista =[1000,1000,1000,1000,1000]
-meta2Lista =[2000,2000,2000,2000,2000]
-meta3Lista =[3000,3000,3000,3000,3000]
-meta4Lista =[4000,4000,4000,4000,4000]
+codigoVendedorLista =["05","30","12","06","08",]
+
 
 for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista):
     caminho_arquivo_csv = 'analise.csv'
