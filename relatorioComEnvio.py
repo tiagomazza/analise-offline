@@ -14,14 +14,17 @@ data_e_horario_formatados = data_e_horario_atual.strftime("%d-%m-%Y %H:%M")
 nomeLista =["Diogo","Orlando","Hugo","Vitor","Fernando",]
 emailVendedorLista =["tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt","tiago.mazza@aborgesdoamaral.pt"]
 #emailVendedor =["diogo.bento@aborgesdoamaral.pt","orlando.cardoso@aborgesdoamaral.pt","hugo.tavares@aborgesdoamaral.pt","vitor.teixeira@aborgesdoamaral.pt","fernando.ladeiro@aborgesdoamaral.pt",]
-codigoVendedorLista =["05","30","12","06","08",]
+codigoVendedorLista =["05","30","12","06","08"]
+meta1Lista = [1000,1000,1000,1000,1000]
+meta2Lista = [2000,2000,2000,2000,2000]
+meta3Lista = [3000,3000,3000,3000,3000]
+meta4Lista = [4000,4000,4000,4000,4000]
 
 
 for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista):
     caminho_arquivo_csv = 'analise.csv'
     dataframe = pd.read_csv(caminho_arquivo_csv, encoding='latin-1', decimal=',', header=0, skiprows=1)
     dataframe['Cliente'] = dataframe['Cliente'].str.replace(r'\D', '', regex=True)
-    dataframe['Vd'] = dataframe['Vd'].str.replace(r'\D', '', regex=True)
     dataframe['Ano'] = pd.to_datetime(dataframe['Ano'], format='%Y')
     dataframe_vd = dataframe.loc[dataframe['Vd'] == codigoVendedor]
     dataframe_2023 = dataframe_vd.loc[dataframe['Ano'].dt.year == 2023]
