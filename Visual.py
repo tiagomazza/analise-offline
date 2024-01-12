@@ -21,18 +21,25 @@ meta4Lista = []
 class Aplicacao:
     def __init__(self, janela):
         self.janela = janela
-        self.janela.title("Envio de metas por email")
+        self.janela.title("METAS")
 
         self.dataframe = None  # Variável para armazenar o DataFrame
+        self.caminho_salvar_resultados = None  # Variável para armazenar o caminho escolhido pelo usuário
+        self.nome_arquivo = "teste.txt"  # Nome do arquivo a ser adicionado ao caminho
 
         # Criar um botão para carregar o arquivo XLSX
-        self.botao_carregar_xlsx = tk.Button(self.janela, text="Carregue os dados", command=self.carregar_xlsx)
+        self.botao_carregar_xlsx = tk.Button(self.janela, text="Carregue os dados básicos da análise", command=self.carregar_xlsx)
         self.botao_carregar_xlsx.pack(pady=20)
 
         # Criar um segundo botão para carregar o arquivo CSV
-        self.botao_carregar_csv = tk.Button(self.janela, text="Carregar CSV", command=self.carregar_csv)
+        self.botao_carregar_csv = tk.Button(self.janela, text="Carregar a planilha com os dados a serem analisados", command=self.carregar_csv)
         self.botao_carregar_csv.pack(pady=20)
         self.botao_carregar_csv.pack_forget()  # Ocultar o segundo botão inicialmente
+
+        # Criar um terceiro botão para selecionar a pasta de destino
+        self.botao_selecionar_pasta = tk.Button(self.janela, text="Selecionar Pasta de Destino", command=self.selecionar_pasta_destino)
+        self.botao_selecionar_pasta.pack(pady=20)
+        self.botao_selecionar_pasta.pack_forget()  # Ocultar o terceiro botão inicialmente
 
     def carregar_xlsx(self):
         # Abrir a caixa de diálogo para seleção do arquivo XLSX
@@ -66,6 +73,7 @@ class Aplicacao:
                 messagebox.showerror("Erro", f"Erro ao carregar o arquivo XLSX: {str(e)}")
 
     def carregar_csv(self):
+        global caminho_csv
         # Abrir a caixa de diálogo para seleção do arquivo CSV
         caminho_csv = filedialog.askopenfilename(filetypes=[("Arquivos CSV", "*.csv")])
 
@@ -81,9 +89,30 @@ class Aplicacao:
                 mensagem_sucesso = "CSV carregado com sucesso!"
                 messagebox.showinfo("Sucesso", mensagem_sucesso)
 
+                # Mostrar o terceiro botão após o carregamento do CSV
+                self.botao_selecionar_pasta.pack()
+
             except Exception as e:
                 # Exibir mensagem de erro
                 messagebox.showerror("Erro", f"Erro ao carregar o arquivo CSV: {str(e)}")
+
+    def selecionar_pasta_destino(self):
+        # Abrir a caixa de diálogo para seleção da pasta de destino
+        pasta_destino = filedialog.askdirectory()
+
+        if pasta_destino:
+            try:
+                # Concatenar o caminho escolhido pelo usuário com o nome do arquivo
+                self.caminho_salvar_resultados = os.path.join(pasta_destino, self.nome_arquivo)
+
+                # Exibir mensagem de sucesso
+                mensagem_sucesso = "Pasta de destino selecionada com sucesso!"
+                messagebox.showinfo("Sucesso", mensagem_sucesso)
+
+            except Exception as e:
+                # Exibir mensagem de erro
+                messagebox.showerror("Erro", f"Erro ao selecionar a pasta de destino: {str(e)}")
+
 janela_principal = tk.Tk()
 
 # Criar uma instância da classe Aplicacao
@@ -91,3 +120,5 @@ app = Aplicacao(janela_principal)
 
 # Iniciar o loop principal
 janela_principal.mainloop()
+
+print(app.caminho_salvar_resultados)  # Exibir o caminho escolhido pelo usuário após o encerramento da interface gráfica

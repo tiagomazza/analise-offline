@@ -215,7 +215,7 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     plt.savefig(donut_chart_path, format='png', bbox_inches='tight')
     plt.close()
 
-    localDoArquivo = f'C:/Users/tiagomazza/Desktop/analise offline/analise-offline/relatorio de vendas {salesman}.pdf'
+    localDoArquivo = f'C:/Windows/Users/tiagomazza/Desktop/analise-offline/relatorio de vendas {salesman}.pdf'
     # Criar um arquivo PDF e inserir as imagens
     with open(localDoArquivo, 'wb') as pdf_file:
         pdf = canvas.Canvas(pdf_file, pagesize=A4)
