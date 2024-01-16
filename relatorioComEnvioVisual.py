@@ -132,16 +132,19 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     dataframe_merge = pd.merge(dataframe_2023, dataframe_2024, left_index=True, right_index=True, how='outer', suffixes=('_2023', '_2024'))
     dataframe_merge = dataframe_merge.sort_values(by='Janeiro_2023', ascending=True)  # Altere para 'ascending=False' se desejar ordem decrescente
 
-    # Ajuste do tamanho do gráfico e espaçamento entre barras
-    fig, ax = plt.subplots(figsize=(10, len(dataframe_merge) * 0.2 ))  # Ajuste da altura e da margem inferior
+    
+    fig, ax = plt.subplots(figsize=(10, len(dataframe_merge) * 0.2))  # Ajuste da altura e da margem inferior
     largura_barra = 0.5  # Ajuste da largura
 
     # Posições das barras
     posicoes = range(len(dataframe_merge))
 
-    ax.barh(posicoes, dataframe_merge['Janeiro_2023'], height=largura_barra, label='2023', color='red', edgecolor='none')
-    ax.barh([pos + largura_barra for pos in posicoes], dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none', left=0)
-    #ax.barh(posicoes, dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none', left=0)
+    ax.barh(posicoes, dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none')
+    ax.barh([pos + largura_barra for pos in posicoes], dataframe_merge['Janeiro_2023'], height=largura_barra, label='2023', color='red', edgecolor='none', left=0)
+
+    # Adicionar valores após as barras no gráfico de barras
+    for pos, valor_2023, valor_2024 in zip(posicoes, dataframe_merge['Janeiro_2023'], dataframe_merge['Janeiro_2024']):
+        ax.text(max(valor_2023, 0.1), pos + largura_barra/2, f'{valor_2023}€', ha='left', va='center', fontsize=8, color='red')
 
     # Configurar o eixo y
     ax.set_yticks([pos + largura_barra / 2 for pos in posicoes])
@@ -151,6 +154,11 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     ax.set_xlabel('Valores de Janeiro', fontsize=8)
     ax.set_ylabel('Clientes', fontsize=12)
     ax.set_title('Comparação entre 2023 e 2024 - Janeiro', fontsize=14)
+
+    for pos, valor_2023, valor_2024 in zip(posicoes, dataframe_merge['Janeiro_2023'], dataframe_merge['Janeiro_2024']):
+        ax.text(valor_2023, pos + largura_barra/2, f'{valor_2023}€', ha='left', va='center', fontsize=8, color='red')
+        
+
 
 
     for spine in ax.spines.values():
@@ -216,7 +224,7 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     plt.savefig(donut_chart_path, format='png', bbox_inches='tight')
     plt.close()
 
-    localDoArquivo = f'C:/Windows/Users/tiagomazza/Desktop/analise-offline/relatorio de vendas {salesman}.pdf'
+    localDoArquivo = f'C:/Users/tiagomazza/Desktop/analise-offline/relatorio de vendas {salesman}.pdf'
     # Criar um arquivo PDF e inserir as imagens
     with open(localDoArquivo, 'wb') as pdf_file:
         pdf = canvas.Canvas(pdf_file, pagesize=A4)
