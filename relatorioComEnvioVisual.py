@@ -140,7 +140,8 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     posicoes = range(len(dataframe_merge))
 
     ax.barh(posicoes, dataframe_merge['Janeiro_2023'], height=largura_barra, label='2023', color='red', edgecolor='none')
-    ax.barh(posicoes, dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none', left=0)
+    ax.barh([pos + largura_barra for pos in posicoes], dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none', left=0)
+    #ax.barh(posicoes, dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none', left=0)
 
     # Configurar o eixo y
     ax.set_yticks([pos + largura_barra / 2 for pos in posicoes])
@@ -245,7 +246,7 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
         
         attachment_path = localDoArquivo
         email.Attachments.Add(attachment_path)
-        email.Send()
+        #email.Send()
         print('E-mail enviado com sucesso!')
     except Exception as e:
         print(f'Erro: {e}')
