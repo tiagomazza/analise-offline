@@ -17,6 +17,10 @@ meta1Lista = []
 meta2Lista = []
 meta3Lista = []
 meta4Lista = []
+bonus1Lista = []
+bonus2Lista = []
+bonus3Lista = []
+bonus4Lista = []
 
 class Aplicacao:
     def __init__(self, janela):
@@ -44,7 +48,7 @@ class Aplicacao:
                 self.dataframe = pd.read_excel(caminho_arquivo)
 
                 # Preencher as listas globais com os valores de cada coluna
-                global nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista
+                global nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista, bonus1Lista, bonus2Lista, bonus3Lista, bonus4Lista
                 nomeLista = self.dataframe['Nome'].astype(str).tolist()
                 emailVendedorLista = self.dataframe['Email'].astype(str).tolist()
                 codigoVendedorLista = self.dataframe['Código'].astype(str).tolist()
@@ -53,6 +57,10 @@ class Aplicacao:
                 meta2Lista = self.dataframe['Meta 2'].astype(int).tolist()
                 meta3Lista = self.dataframe['Meta 3'].astype(int).tolist()
                 meta4Lista = self.dataframe['Meta 4'].astype(int).tolist()
+                bonus1Lista = self.dataframe['Bonus da Meta 1'].astype(int).tolist()
+                bonus2Lista = self.dataframe['Bonus da Meta 2'].astype(int).tolist()
+                bonus3Lista = self.dataframe['Bonus da Meta 3'].astype(int).tolist()
+                bonus4Lista = self.dataframe['Bonus da Meta 4'].astype(int).tolist()
 
                 # Exibir mensagem de sucesso
                 mensagem_sucesso = "XLSX carregado com sucesso! Feche o programa que enviaremos os emails"
@@ -110,7 +118,7 @@ data_e_horario_atual = datetime.now()
 data_e_horario_formatados = data_e_horario_atual.strftime("%d-%m-%Y %H:%M")
 
 
-for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista):
+for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBonus1, valorBonus2, valorBonus3, valorBonus4 in zip (nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista, bonus1Lista, bonus2Lista, bonus3Lista, bonus4Lista):
     #caminho_arquivo_csv = 'analise.csv'
     dataframe = pd.read_csv(caminho_csv, encoding='latin-1', decimal=',', header=0, skiprows=1)
     dataframe['Cliente'] = dataframe['Cliente'].str.replace(r'\D', '', regex=True)
@@ -139,8 +147,8 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     # Posições das barras
     posicoes = range(len(dataframe_merge))
 
+    ax.barh(posicoes, dataframe_merge['Janeiro_2023'], height=largura_barra, label='2023', color='red', edgecolor='none')
     ax.barh(posicoes, dataframe_merge['Janeiro_2024'], height=largura_barra, label='2024', color='blue', edgecolor='none')
-    ax.barh([pos + largura_barra for pos in posicoes], dataframe_merge['Janeiro_2023'], height=largura_barra, label='2023', color='red', edgecolor='none', left=0)
 
     # Adicionar valores após as barras no gráfico de barras
     for pos, valor_2023, valor_2024 in zip(posicoes, dataframe_merge['Janeiro_2023'], dataframe_merge['Janeiro_2024']):
@@ -172,12 +180,15 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
     #######GRAFICO CIRCULAR###########################
 
     vendasMes = dataframe_2024['Janeiro'].sum()
+    metas = [meta1, meta2, meta3]
+    metas_formatadas = list(map(lambda x: '{:,.2f}'.format(x).replace(',', '.'), metas))
+    bonus = [valorBonus1, valorBonus2, valorBonus3]
+    bonus_formatados = list(map(lambda x: '{:,.2f}'.format(x).replace(',', '.'), bonus))
+    bonus = bonus_formatados
 
-    metas = [meta1, meta2, meta3, meta4]
+    fig, ax = plt.subplots(1, 3, figsize=(15, 4))
 
-    fig, ax = plt.subplots(1, 4, figsize=(15, 4))
-
-    for i, meta in enumerate(metas):
+    for i, (meta, bonu, meta_format) in enumerate(zip(metas,bonus,metas_formatadas)):
         porcentagem_vendas_mes = (vendasMes / meta) * 100
         porcentagem_meta = 100 - porcentagem_vendas_mes
 
@@ -186,7 +197,7 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
         porcentagem_meta = 100 - porcentagem_vendas_mes
 
         # Cores para os gráficos
-        cores = ['white', 'red']
+        cores = ['lightgrey', 'blue']
 
         # Criar o gráfico de donut
         donut = ax[i].pie([porcentagem_meta, porcentagem_vendas_mes], startangle=90, colors=cores, wedgeprops=dict(width=0.3))
@@ -196,10 +207,10 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4 in zip (
         ax[i].add_patch(centro_do_circulo)
 
         # Adicionar o número no meio representando a porcentagem
-        ax[i].text(0, 0, f'{porcentagem_vendas_mes:.1f}%', ha='center', va='center', fontsize=12, color='black')
+        ax[i].text(0, 0, f'{porcentagem_vendas_mes:.1f}%', ha='center', va='center', fontsize=30, color='black', fontstyle ='normal')
 
         # Adicionar título com a variável e valor correspondentes
-        ax[i].set_title(f'Meta: {meta}')
+        ax[i].set_title(f'Meta: {meta_format}€ \n Bonus:{bonu}€', color='dimgrey')
 
         # Se a porcentagem ultrapassar 100%, atualizar a variável meta e atualizar o gráfico
         if porcentagem_vendas_mes > 100:
