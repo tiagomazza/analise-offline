@@ -9,6 +9,7 @@ import tempfile
 import os
 from datetime import datetime
 import win32com.client as win32
+from tkinter import ttk
 
 # Listas globais para armazenar os valores de cada coluna
 nomeLista = []
@@ -27,21 +28,37 @@ class Aplicacao:
     def __init__(self, janela):
         self.janela = janela
         self.janela.title("METAS")
+        self.janela.geometry("270x250")
+
+        self.mes_selecionado_variavel = None  # Variável para armazenar o mês selecionado
+
 
         self.dataframe = None  # Variável para armazenar o DataFrame
+        self.meses_variaveis = {}
 
         # Criar um botão para carregar o arquivo XLSX
-        self.botao_carregar_xlsx = tk.Button(self.janela, text="Carregue os dados basicos da análise", command=self.carregar_xlsx)
+        self.botao_carregar_xlsx = tk.Button(self.janela, text="Carregar Parâmetros", command=self.carregar_xlsx)
         self.botao_carregar_xlsx.pack(pady=20)
 
         # Criar um segundo botão para carregar o arquivo CSV
-        self.botao_carregar_csv = tk.Button(self.janela, text="Carregar a planilha com os dados a serem analisados", command=self.carregar_csv)
+        self.botao_carregar_csv = tk.Button(self.janela, text="Carregar dados a serem analisados", command=self.carregar_csv)
         self.botao_carregar_csv.pack(pady=20)
-        self.botao_carregar_csv.pack_forget()  # Ocultar o segundo botão inicialmente
+        #self.botao_carregar_csv.pack_forget()  # Ocultar o segundo botão inicialmente
+
+        self.meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+        self.mes_selecionado = tk.StringVar()
+        self.combo_meses = ttk.Combobox(self.janela, textvariable=self.mes_selecionado, values=self.meses)
+        self.combo_meses.set("Selecione o Mês")
+        self.combo_meses.pack(pady=10)
+
+        # Adicionar um botão para processar as operações com o mês selecionado
+        self.botao_processar_mes = tk.Button(self.janela, text="Processar Mês", command=self.processar_mes)
+        self.botao_processar_mes.pack(pady=10)
 
     def carregar_xlsx(self):
         # Abrir a caixa de diálogo para seleção do arquivo XLSX
         caminho_arquivo = filedialog.askopenfilename(filetypes=[("Arquivos Excel", "*.xlsx")])
+        
 
         if caminho_arquivo:
             try:
@@ -69,10 +86,47 @@ class Aplicacao:
 
                 # Mostrar o segundo botão após o carregamento do XLSX
                 self.botao_carregar_csv.pack()
+                #self.botao_selecionar_mes = tk.Button(self.janela, text="Selecionar Mês", command=self.exibir_selecao_mes)
+                #self.botao_selecionar_mes.pack(pady=20)
+                #self.botao_carregar_csv.pack()
+
+                self.meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+                self.mes_selecionado = tk.StringVar()
+                self.combo_meses = ttk.Combobox(self.janela, textvariable=self.mes_selecionado, values=self.meses)
+                self.combo_meses.set("Selecione o Mês")
+                self.combo_meses.pack(pady=10)
+
+                self.botao_processar_mes = tk.Button(self.janela, text="Processar Mês", command=self.processar_mes)
+
+                self.botao_processar_mes.pack(pady=10)
 
             except Exception as e:
                 # Exibir mensagem de erro
                 messagebox.showerror("Erro", f"Erro ao carregar o arquivo XLSX: {str(e)}")
+
+
+    def atribuir_mes_selecionado(self):
+        mes_selecionado = self.mes_selecionado.get()
+        if mes_selecionado:
+            self.mes_selecionado_variavel = mes_selecionado
+            print("Mês Selecionado:", self.mes_selecionado_variavel)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um mês válido.")
+
+
+    def exibir_selecao_mes(self):
+            mes_selecionado = self.mes_selecionado.get()
+            if mes_selecionado:
+                self.mes_selecionado_variavel = mes_selecionado
+                print("Mês Selecionado:", self.mes_selecionado_variavel)
+            else:
+                messagebox.showwarning("Aviso", "Selecione um mês válido.")
+
+    def processar_mes(self):
+        if self.mes_selecionado_variavel:
+            print("Mês Selecionado:", self.mes_selecionado_variavel)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um mês válido.")
 
     def carregar_csv(self):
         global caminho_csv
@@ -99,20 +153,28 @@ janela_principal.iconbitmap('icone.ico')
 # Criar uma instância da classe Aplicacao
 app = Aplicacao(janela_principal)
 
-
-# Iniciar o loop principal
 janela_principal.mainloop()
+# Iniciar o loop principal
 
-# Imprimir o conteúdo das listas no final do código
-print("Conteúdo das Listas:")
-print("nomeLista:", nomeLista)
-print("emailVendedorLista:", emailVendedorLista)
-print("codigoVendedorLista:", codigoVendedorLista)
-print("meta1Lista:", meta1Lista)
-print("meta2Lista:", meta2Lista)
-print("meta3Lista:", meta3Lista)
-print("meta4Lista:", meta4Lista)
 
+# # Imprimir o conteúdo das listas no final do código
+# dfmes = pd.read_csv(caminho_csv, encoding='latin-1', decimal=',', header=0, skiprows=1)
+# df2 = pd.DataFrame(dfmes)
+
+# def on_select(event):
+#     selected_column = column_combobox.get()
+#     print("Coluna selecionada:", selected_column)
+
+# # Obter as colunas do DataFrame
+# columns = df2.columns.tolist()
+
+# # Criar a caixa suspensa (Combobox)
+# column_combobox = ttk.Combobox(janela_principal, values=columns)
+# column_combobox.set("Selecione uma coluna")  # Texto padrão exibido na caixa suspensa
+# column_combobox.bind("<<ComboboxSelected>>", on_select)
+
+# # Exibir a caixa suspensa
+# column_combobox.pack(pady=10)
 
 
 
