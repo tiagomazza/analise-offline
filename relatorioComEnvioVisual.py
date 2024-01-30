@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
 import tempfile
 import os
 from datetime import datetime
@@ -63,7 +64,7 @@ class Aplicacao:
                 bonus4Lista = self.dataframe['Bonus da Meta 4'].astype(int).tolist()
 
                 # Exibir mensagem de sucesso
-                mensagem_sucesso = "XLSX carregado com sucesso! Feche o programa que enviaremos os emails"
+                mensagem_sucesso = "Paramentros XLSX carregado com sucesso! Hora de carregar os dados a serem analisádos"
                 messagebox.showinfo("Sucesso", mensagem_sucesso)
 
                 # Mostrar o segundo botão após o carregamento do XLSX
@@ -87,16 +88,17 @@ class Aplicacao:
                 # ...
 
                 # Exibir mensagem de sucesso
-                mensagem_sucesso = "CSV carregado com sucesso!"
+                mensagem_sucesso = "dados em CSV carregados! Feche o programa para gerar os relatórios"
                 messagebox.showinfo("Sucesso", mensagem_sucesso)
 
             except Exception as e:
                 # Exibir mensagem de erro
                 messagebox.showerror("Erro", f"Erro ao carregar o arquivo CSV: {str(e)}")
 janela_principal = tk.Tk()
-
+janela_principal.iconbitmap('icone.ico')
 # Criar uma instância da classe Aplicacao
 app = Aplicacao(janela_principal)
+
 
 # Iniciar o loop principal
 janela_principal.mainloop()
@@ -117,6 +119,7 @@ print("meta4Lista:", meta4Lista)
 data_e_horario_atual = datetime.now()
 data_e_horario_formatados = data_e_horario_atual.strftime("%d-%m-%Y %H:%M")
 
+local = filedialog.askdirectory()
 
 for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBonus1, valorBonus2, valorBonus3, valorBonus4 in zip (nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista, bonus1Lista, bonus2Lista, bonus3Lista, bonus4Lista):
     #caminho_arquivo_csv = 'analise.csv'
@@ -141,7 +144,7 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBo
     dataframe_merge = dataframe_merge.sort_values(by='Janeiro_2023', ascending=True)  # Altere para 'ascending=False' se desejar ordem decrescente
 
     
-    fig, ax = plt.subplots(figsize=(10, len(dataframe_merge) * 0.2))  # Ajuste da altura e da margem inferior
+    fig, ax = plt.subplots(figsize=(10, len(dataframe_merge) * 0.3))  # Ajuste da altura e da margem inferior
     largura_barra = 0.5  # Ajuste da largura
 
     # Posições das barras
@@ -152,23 +155,20 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBo
 
     # Adicionar valores após as barras no gráfico de barras
     for pos, valor_2023, valor_2024 in zip(posicoes, dataframe_merge['Janeiro_2023'], dataframe_merge['Janeiro_2024']):
-        ax.text(max(valor_2023, 0.1), pos + largura_barra/2, f'{valor_2023}€', ha='left', va='center', fontsize=8, color='red')
+        ax.text(max(valor_2023, 0.5), pos + largura_barra/2, f'{valor_2023}€', ha='left', va='center', fontsize=8, color='red')
 
     # Configurar o eixo y
     ax.set_yticks([pos + largura_barra / 2 for pos in posicoes])
     ax.set_yticklabels(dataframe_merge.index, fontsize=9, ha='right')  # Ajuste o tamanho da fonte do índice
 
     # Adicionar rótulos e título
-    ax.set_xlabel('Valores de Janeiro', fontsize=8)
-    ax.set_ylabel('Clientes', fontsize=12)
-    ax.set_title('Comparação entre 2023 e 2024 - Janeiro', fontsize=14)
+    #ax.set_xlabel('Valores de Janeiro', fontsize=8)
+    #ax.set_ylabel('Clientes', fontsize=12)
+    #ax.set_title('Comparação entre 2023 e 2024 - Janeiro', fontsize=14)
 
     for pos, valor_2023, valor_2024 in zip(posicoes, dataframe_merge['Janeiro_2023'], dataframe_merge['Janeiro_2024']):
         ax.text(valor_2023, pos + largura_barra/2, f'{valor_2023}€', ha='left', va='center', fontsize=8, color='red')
         
-
-
-
     for spine in ax.spines.values():
         spine.set_visible(False)
 
@@ -227,7 +227,10 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBo
             # Adicionar título para a nova meta
             ax[i].set_title(f'Meta: {meta}')
 
-    plt.suptitle(f'Porcentagem de Vendas em Relação à Meta. Já tem {vendasMes}€ vendidos ')
+    vendasMes = round(vendasMes,2)
+    vendasMes_format = '{:,}'.format(vendasMes)
+
+    plt.suptitle(f'Porcentagem de Vendas em Relação à Meta. Já tem {vendasMes_format}€ vendidos ')
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     # Salvar o segundo gráfico como uma imagem temporária
@@ -235,18 +238,27 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBo
     plt.savefig(donut_chart_path, format='png', bbox_inches='tight')
     plt.close()
 
-    localDoArquivo = f'C:/Users/tiagomazza/Desktop/analise-offline/relatorio de vendas {salesman}.pdf'
+    #C:/Users/tiagomazza/Desktop/analise-offline
+    localDoArquivo = f'{local}/relatorio de vendas {salesman}.pdf'
+    #localDoArquivo = f'C:/Users/tiagomazza/Desktop/analise-offline/relatorio de vendas {salesman}.pdf'
     # Criar um arquivo PDF e inserir as imagens
     with open(localDoArquivo, 'wb') as pdf_file:
         pdf = canvas.Canvas(pdf_file, pagesize=A4)
-
+       
         # Inserir imagem do primeiro gráfico
-        pdf.drawInlineImage(donut_chart_path, 35, 600, width=550, height=150)
+        pdf.drawInlineImage(donut_chart_path, 35, 575, width=500, height=150)
         #pdf.drawInlineImage(bar_chart_path, 20, 60, width=500, height=550)
 
-        pdf.drawString(72, 780, f"Relatório de vendas do vendedor {salesman} - realizado as {data_e_horario_formatados}")
-        pdf.drawImage(bar_chart_path, 20, 20, width=500, height=550)
+        pdf.setFont("Helvetica-Bold", 30)
+        pdf.drawString(40, 780, f"Relatório de vendas")
+        pdf.setFont("Helvetica-Oblique", 12)
+        pdf.drawString(40, 760, f"vendedor {salesman} - realizado as {data_e_horario_formatados}")
+        pdf.drawImage(bar_chart_path, 10, 30, width=570, height=500)
         # Adicionar uma nova página para o segundo gráfico
+        img = ImageReader("logo.jpg")
+        pdf.drawImage(img, 460, 750, width=75, height=60)
+        pdf.setFont("Helvetica", 20)
+        pdf.drawString(40, 530, f"Comparativo de vendas")
         pdf.showPage()
 
         pdf.save()
