@@ -42,10 +42,17 @@ class Aplicacao:
         self.botao_carregar_csv.pack(pady=20)
         #self.botao_carregar_csv.pack_forget()  # Ocultar o segundo botão inicialmente
 
-        self.botao_on_select = tk.Button(janela_principal, text="Executar on_select", command=self.on_select)
+        self.botao_on_select = tk.Button(janela_principal, text="Escolher local onde salvar os ficheiros", command=self.save_local)
         self.botao_on_select.pack(pady=10)
 
+        #self.gerar_relatorios = tk.Button(janela_principal, text="Gerar relatórios", command=self.save_local)
+        self.botao_on_select.pack(pady=30)
+
         self.column_combobox = None  # Adicionado atributo column_combobox
+
+        self.rotulo = tk.Label(self.janela, text="Escolha o mês de análise")
+        
+
 
 
     def carregar_xlsx(self):
@@ -72,7 +79,7 @@ class Aplicacao:
 
                 mensagem_sucesso = "Paramentros XLSX carregado com sucesso! Hora de carregar os dados a serem analisádos"
                 messagebox.showinfo("Sucesso", mensagem_sucesso)
-
+                self.botao_carregar_xlsx.config(fg="green")
                 self.botao_carregar_csv.pack()
 
             except Exception as e:
@@ -91,11 +98,13 @@ class Aplicacao:
 
                 self.column_combobox = ttk.Combobox(janela_principal, values=columns)
                 self.column_combobox.set("Selecione um mês")  
-                self.column_combobox.bind("<<ComboboxSelected>>", on_select)
+                self.column_combobox.bind("<<ComboboxSelected>>", self.on_select)
                 self.column_combobox.pack(pady=10)
 
                 mensagem_sucesso = "dados em CSV carregados! Feche o programa para gerar os relatórios"
+                self.botao_carregar_csv.config(fg="green")
                 messagebox.showinfo("Sucesso", mensagem_sucesso)
+                
    
 
             except Exception as e:
@@ -107,7 +116,10 @@ class Aplicacao:
             coluna_selecionada = selected_column
             print("Coluna selecionada:", coluna_selecionada)    
 
-    
+    def save_local(self):
+        global local
+        local = filedialog.askdirectory()
+        self.botao_on_select.config(fg="green")
 
 janela_principal = tk.Tk()
 janela_principal.iconbitmap('icone.ico')
@@ -119,7 +131,6 @@ app = Aplicacao(janela_principal)
 
 janela_principal.mainloop()
 
-local = filedialog.askdirectory()
 
 for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBonus1, valorBonus2, valorBonus3, valorBonus4 in zip (nomeLista, emailVendedorLista, codigoVendedorLista, meta1Lista, meta2Lista, meta3Lista, meta4Lista, bonus1Lista, bonus2Lista, bonus3Lista, bonus4Lista):
     #caminho_arquivo_csv = 'analise.csv'
