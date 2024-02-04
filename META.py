@@ -9,7 +9,7 @@ from reportlab.lib.utils import ImageReader
 import tempfile
 import os
 from datetime import datetime
-#import win32com.client as win32
+import win32com.client as win32
 import re
 
 nomeLista = []
