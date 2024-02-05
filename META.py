@@ -288,7 +288,7 @@ for salesman, emailVendedor, codigoVendedor, meta1, meta2, meta3, meta4, valorBo
         
         attachment_path = localDoArquivo
         email.Attachments.Add(attachment_path)
-        #email.Send()
+        email.Send()
         print('E-mail enviado com sucesso!')
     except Exception as e:
         print(f'Erro: {e}')

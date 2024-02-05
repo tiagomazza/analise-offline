@@ -44,9 +44,6 @@ botao.pack(pady=10)
 spin_valor = tk.Spinbox(janela, from_=0, to=100, increment=1)
 spin_valor.pack(pady=10)
 
-        
-
-
 janela.mainloop()
 
 print (coluna_selecionada)
